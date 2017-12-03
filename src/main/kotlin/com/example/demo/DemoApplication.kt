@@ -48,6 +48,7 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
                     .build().toUriString()
         }()
 
+        // We don't need to refresh state.
         val state = fun(): String {
             val currentState = session.getAttribute("state")
             if (currentState is String) {
@@ -59,6 +60,7 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
             return newState
         }()
 
+        // We should refresh nonce every time.
         val nonce = fun(): String {
             val nonce = UUID.randomUUID().toString()
             session.setAttribute(nonce, true)
