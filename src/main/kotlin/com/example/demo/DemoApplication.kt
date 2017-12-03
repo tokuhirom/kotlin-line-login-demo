@@ -87,6 +87,7 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
             @RequestParam("error_description", required = false) errorDescription: String?,
             servletRequest: HttpServletRequest,
             session: HttpSession): Map<String, String?> {
+        // check error response
         if (error != null) {
             return mapOf(
                     "error" to error,
@@ -94,12 +95,14 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
             )
         }
 
+        // validate state value
         val sessionState = session.getAttribute("state")
         if (!(sessionState is String && sessionState == state)) {
             // TODO show error page?
             throw IllegalStateException("Invalid state")
         }
 
+        //  request token
         val response = fun(): LineLoginTokenResponse {
             val formBody = FormBody.Builder()
                     .add("grant_type", "authorization_code")
@@ -121,6 +124,8 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
             }
             return objectMapper.readValue(response.body().bytes(), LineLoginTokenResponse::class.java)
         }()
+
+        // parse jwt
         val jwt = JWTParser.parse(response.id_token)
         if (!(jwt as SignedJWT).verify(MACVerifier(lineLoginProperties.clientSecret))) {
             throw Exception("Invalid signature")
