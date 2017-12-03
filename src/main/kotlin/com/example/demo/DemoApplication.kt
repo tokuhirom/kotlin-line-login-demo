@@ -107,15 +107,15 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
             throw IllegalStateException("Invalid state")
         }
 
-        val formBody = FormBody.Builder()
-                .add("grant_type", "authorization_code")
-                .add("code", code)
-                .add("redirect_uri", servletRequest.requestURL.toString())
-                .add("client_id", lineLoginProperties.clientId)
-                .add("client_secret", lineLoginProperties.clientSecret)
-                .build()
-
         val response = fun(): LineLoginTokenResponse {
+            val formBody = FormBody.Builder()
+                    .add("grant_type", "authorization_code")
+                    .add("code", code)
+                    .add("redirect_uri", servletRequest.requestURL.toString())
+                    .add("client_id", lineLoginProperties.clientId)
+                    .add("client_secret", lineLoginProperties.clientSecret)
+                    .build()
+
             val request = Request.Builder()
                     .post(formBody)
                     .url("https://api.line.me/oauth2/v2.1/token")
