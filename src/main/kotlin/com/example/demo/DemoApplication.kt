@@ -13,7 +13,6 @@ import org.springframework.boot.runApplication
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.ui.Model
-import org.springframework.ui.set
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -42,11 +41,10 @@ class LineLoginProperties {
 class MyController(val lineLoginProperties: LineLoginProperties, val objectMapper: ObjectMapper) {
     @GetMapping("/", produces = arrayOf("text/html"))
     fun index(session: HttpSession, model: Model, request: HttpServletRequest): String {
-        val redirectUrl = fun(): String {
-            return UriComponentsBuilder.fromUriString(request.requestURL.toString())
-                    .path("/callback")
-                    .build().toUriString()
-        }()
+        val redirectUrl = UriComponentsBuilder
+                .fromUriString(request.requestURL.toString())
+                .path("/callback")
+                .build().toUriString()
 
         // We don't need to refresh state.
         val state = fun(): String {
@@ -87,14 +85,9 @@ class MyController(val lineLoginProperties: LineLoginProperties, val objectMappe
             @RequestParam("friendship_status_changed", required = false) friendshipStatusChanged: Boolean?,
             @RequestParam("error", required = false) error: String?,
             @RequestParam("error_description", required = false) errorDescription: String?,
-            model: Model,
             servletRequest: HttpServletRequest,
             session: HttpSession): Map<String, String?> {
         if (error != null) {
-            model["error"] = error
-            if (errorDescription != null) {
-                model["errorDescription"] = errorDescription
-            }
             return mapOf(
                     "error" to error,
                     "errorDescription" to errorDescription
